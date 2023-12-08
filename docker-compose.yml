@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "localhost:192.168.221.200"
+    image: 'crypto-currency-exchanger'
+    container_name: crypto-currency
+    depends_on:
+      - ccxt
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ccxt:5432/crypto-currency
+      - SPRING_DATASOURCE_USERNAME=crypto
+      - SPRING_DATASOURCE_PASSWORD=crypto
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  ccxt:
+    image: 'postgres:13.1-alpine'
+    container_name: ccxt
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=crypto
+      - POSTGRES_PASSWORD=crypto
+      - POSTGRES_DB=crypto-currency
