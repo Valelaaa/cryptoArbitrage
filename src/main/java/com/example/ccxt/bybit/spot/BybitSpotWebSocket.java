@@ -1,11 +1,10 @@
 package com.example.ccxt.bybit.spot;
 
 
+import com.example.ccxt.bybit.spot.domen.api.BybitService;
 import com.example.ccxt.bybit.spot.entity.Symbol;
-import com.example.ccxt.bybit.spot.service.BybitService;
 import com.example.ccxt.bybit.spot.service.SymbolsService;
 import com.google.gson.JsonObject;
-import lombok.SneakyThrows;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
@@ -48,7 +47,7 @@ public class BybitSpotWebSocket extends WebSocketClient {
 
     @Scheduled(fixedRate = 20000)
     public void sendPing() {
-        if(!isOpen()) {
+        if (!isOpen()) {
             JsonObject pingMessage = new JsonObject();
             pingMessage.addProperty("op", "ping");
 
@@ -72,13 +71,13 @@ public class BybitSpotWebSocket extends WebSocketClient {
     }
 
     public void subscribeToTicker(final Symbol symbol) {
-        String subscribeMessage = "{\"op\":\"subscribe\",\"args\":[\"tickers." + symbol.getSymbol() + "\"]}";
+        String subscribeMessage = "{\"op\":\"subscribe\",\"args\":[\"tickers." + symbol.toString() + "\"]}";
         log.info("SEND REQUEST TO SUBSCRIPTION: " + subscribeMessage);
         this.send(subscribeMessage);
     }
 
     public void subscribeToTickers(final List<Symbol> symbolList) {
-        String symbols = symbolList.stream().map(symbol -> "\"tickers." + symbol.getSymbol() + "\"").collect(Collectors.joining(","));
+        String symbols = symbolList.stream().map(symbol -> "\"tickers." + symbol.toString() + "\"").collect(Collectors.joining(","));
         String subscribeMessage = "{\"op\":\"subscribe\",\"args\":[" + symbols + "]}";
         log.info("REQUEST SENDED TO: " + subscribeMessage);
         this.send(subscribeMessage);
@@ -94,7 +93,7 @@ public class BybitSpotWebSocket extends WebSocketClient {
                 symbolSubList = symbolList.subList(i, i + chunk);
             else
                 symbolSubList = symbolList.subList(i, symbolList.size() - 1);
-            String symbols = symbolSubList.stream().map(symbol -> "\"tickers." + symbol.getSymbol() + "\"").collect(Collectors.joining(","));
+            String symbols = symbolSubList.stream().map(symbol -> "\"tickers." + symbol.toString() + "\"").collect(Collectors.joining(","));
 
             String subscribeMessage = "{\"op\":\"subscribe\",\"args\":[" + symbols + "]}";
             log.info("REQUEST SENDED TO: " + subscribeMessage);

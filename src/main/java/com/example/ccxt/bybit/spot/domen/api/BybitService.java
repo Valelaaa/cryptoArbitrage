@@ -1,4 +1,4 @@
-package com.example.ccxt.bybit.spot.service;
+package com.example.ccxt.bybit.spot.domen.api;
 
 import com.example.ccxt.bybit.spot.entity.TickerDto;
 import com.example.ccxt.bybit.spot.service.response.TickersResponse;
@@ -13,6 +13,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import java.io.IOException;
 import java.util.List;
+
 @Service
 public class BybitService {
     public static final String BASE_URL = "https://api.bybit.com";
@@ -29,7 +30,7 @@ public class BybitService {
 
         try {
             Response<TickersResponse> response = call.execute();
-            if (response.isSuccessful()) {
+            if (response.isSuccessful() && response.body() != null) {
                 List<TickerDto> symbols = response.body().getResult().getList();
                 if (symbols != null) {
                     return symbols;
@@ -37,7 +38,7 @@ public class BybitService {
                     log.info("RESPONSE BODY IS NULL");
                 }
             } else {
-                log.info("UNSUCCESSFUL RESPONSE: "+ response.code());
+                log.info("UNSUCCESSFUL RESPONSE: " + response.code());
             }
         } catch (IOException e) {
             e.printStackTrace();
