@@ -5,7 +5,9 @@ import com.example.ccxt.bybit.spot.repository.BaseAssets;
 import com.example.ccxt.bybit.spot.repository.DataStore;
 import com.example.ccxt.bybit.spot.repository.DataStoreProvider;
 import com.example.ccxt.bybit.spot.service.Arbitrage.arbitragealgorithm.Arbitrage;
+import org.apache.commons.lang3.EnumUtils;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -21,29 +23,61 @@ public class ArbitrageOpportunityFinder {
     }
 
     public void findOpportunity() {
-        for (BaseAssets baseAssets : dataStore.keySet()) {
-            ConcurrentHashMap<String, TickerDto> tickerMap1 = dataStore.get(baseAssets);
+        int counter = 0;
+        for (BaseAssets baseAsset : dataStore.keySet()) {
+            ConcurrentHashMap<String, TickerDto> tickerMap1 = dataStore.get(baseAsset);
 
             for (String pair1 : tickerMap1.keySet()) {
                 TickerDto tickerDto = tickerMap1.get(pair1);
-                for (BaseAssets baseAssets2 : dataStore.keySet().stream().filter(asset -> asset != baseAssets).toList()) {
-                    ConcurrentHashMap<String, TickerDto> tickerMap2 = dataStore.get(baseAssets2);
-                    for (String pair2 : tickerMap2.keySet().stream().filter(pair -> !Objects.equals(pair, pair1)).toList()) {
-
-                        // Получаем TickerDto для второй торговой пары
-                        TickerDto tickerDto2 = tickerMap2.get(pair2);
-                        TickerDto ticker3 = null;
-                        if (Objects.nonNull(dataStore.getTicker(BaseAssets.valueOf(pair1), pair2))) {
-                            ticker3 = dataStore.getTicker(BaseAssets.valueOf(pair1), pair2);
-                        } else if (Objects.nonNull(dataStore.getTicker(BaseAssets.valueOf(pair2), pair1))) {
-                            ticker3 = dataStore.getTicker(BaseAssets.valueOf(pair2), pair1);
+                // pair1/baseAssets
+                // pair2/pair1 (pair2 != baseAssets)
+                // pair2/baseAssets
+                if (EnumUtils.isValidEnum(BaseAssets.class, pair1)) {
+                    ConcurrentHashMap<String, TickerDto> innerMap = dataStore.get(BaseAssets.valueOf(pair1));
+                    for (String pair2 : innerMap.keySet().stream().filter(key ->
+                            !Objects.equals(key, baseAsset.value)).toList()) {
+                        TickerDto tickerDto1 = innerMap.get(pair2);
+                        TickerDto tickerDto2 = null;
+                        if (tickerMap1.get(pair2) == null) {
+                            if (!EnumUtils.isValidEnum(BaseAssets.class, pair2))
+                                break;
+                            ConcurrentHashMap<String, TickerDto> tickerMap2 = dataStore.get(BaseAssets.valueOf(pair2));
+                            tickerDto2= tickerMap2.get(pair1);
                         } else {
-                            continue;
+                            tickerDto2 = tickerMap1.get(pair2);
                         }
-                        arbitrage.doArbitrage(tickerDto, tickerDto2, ticker3);
+                        System.out.print(tickerDto.getSymbol() + " -> ");
+                        System.out.print(tickerDto1.getSymbol() + " -> ");
+                        System.out.println(Objects.requireNonNull(tickerDto2).getSymbol());
+                        counter++;
+                    }
+                }
+                // pair1/baseAssets
+                // pair1/baseAsset2 (pair2 != baseAssets)
+                // baseAsset2/baseAssets or baseAsset/baseAsset2
+                else {
+                    for (BaseAssets baseAsset2 : dataStore.keySet().stream().filter(asset -> asset != baseAsset).toList()) {
+                        ConcurrentHashMap<String, TickerDto> innerMap = dataStore.get(baseAsset2);
+                        TickerDto tickerDto1;
+                        if (innerMap.containsKey(pair1)) {
+                            tickerDto1 = innerMap.get(pair1);
+                        } else break;
+                        TickerDto tickerDto2;
+
+                        if (tickerMap1.get(baseAsset2.value) == null) {
+                            ConcurrentHashMap<String, TickerDto> tickerMap2 = dataStore.get(baseAsset2);
+                            tickerDto2 = tickerMap2.get(baseAsset.value);
+                        } else {
+                            tickerDto2 = tickerMap1.get(baseAsset2.value);
+                        }
+                        System.out.print(tickerDto.getSymbol() + " -> ");
+                        System.out.print(tickerDto1.getSymbol() + " -> ");
+                        System.out.println(tickerDto2.getSymbol());
+                        counter++;
                     }
                 }
             }
         }
+        System.out.println(counter);
     }
 }

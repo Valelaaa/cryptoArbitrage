@@ -25,7 +25,7 @@ public class CcxtApplication {
         SpringApplication.run(CcxtApplication.class, args);
         try {
             while (true) {
-                Thread.sleep(10000);
+                Thread.sleep(1000);
                 arbitrageService.doArbitrage();
             }
         } catch (InterruptedException e) {
