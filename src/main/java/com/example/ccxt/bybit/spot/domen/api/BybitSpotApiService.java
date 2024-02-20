@@ -6,7 +6,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 @Service
-public interface BybitApiService {
+public interface BybitSpotApiService {
     @GET("/v5/market/tickers?category=spot")
     Call<TickersResponse> fetchTickers();
 }

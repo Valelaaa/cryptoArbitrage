@@ -1,9 +1,11 @@
-package com.example.ccxt.bybit.spot.service;
+package com.example.ccxt.bybit.spot.websocket;
 
 import com.example.ccxt.bybit.spot.entity.Symbol;
 import com.example.ccxt.bybit.spot.entity.TickerDto;
-import com.example.ccxt.bybit.spot.repository.DataStore;
+import com.example.ccxt.bybit.spot.repository.BybitDataStore;
 import com.example.ccxt.bybit.spot.repository.DataStoreProvider;
+import com.example.ccxt.bybit.spot.repository.graph.GraphProvider;
+import com.example.ccxt.bybit.spot.repository.graph.TickerGraph;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,8 +19,8 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class MessageHandlerProvider {
     //    private final TickerService tickerService;
-    private final DataStore dataStore = DataStoreProvider.getInstance();
-
+    private final BybitDataStore dataStore = DataStoreProvider.getInstance();
+    private final TickerGraph graph = GraphProvider.getInstance();
     public Consumer<String> getMessageHandler() {
         return message -> {
             final JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject().getAsJsonObject("data");
@@ -26,7 +28,8 @@ public class MessageHandlerProvider {
             final TickerDto tickerDto = gson.fromJson(jsonObject, TickerDto.class);
             if (Objects.nonNull(tickerDto)) {
 //                tickerService.updateTicker(tickerDto);
-                dataStore.put(Symbol.valueOf(tickerDto.getSymbol()), tickerDto);
+//                dataStore.put(Symbol.valueOf(tickerDto.getSymbol()), tickerDto);
+                graph.put(Symbol.valueOf(tickerDto.getSymbol()), tickerDto);
             }
         };
     }

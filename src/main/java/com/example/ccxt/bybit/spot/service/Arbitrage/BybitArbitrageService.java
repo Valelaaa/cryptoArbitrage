@@ -3,10 +3,10 @@ package com.example.ccxt.bybit.spot.service.Arbitrage;
 import com.example.ccxt.bybit.spot.repository.BaseAssets;
 import com.example.ccxt.bybit.spot.service.Arbitrage.arbitragealgorithm.Arbitrage;
 
-public class ArbitrageService {
+public class BybitArbitrageService {
     private final Arbitrage arbitrage;
     private final ArbitrageOpportunityFinder arbitrageFinder;
-    public ArbitrageService(Arbitrage chosenArbitrage){
+    public BybitArbitrageService(Arbitrage chosenArbitrage){
         arbitrage = chosenArbitrage;
         arbitrageFinder = new ArbitrageOpportunityFinder(arbitrage, BaseAssets.USDT);
     }

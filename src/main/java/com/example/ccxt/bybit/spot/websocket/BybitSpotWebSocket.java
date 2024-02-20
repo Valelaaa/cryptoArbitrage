@@ -1,10 +1,9 @@
-package com.example.ccxt.bybit.spot;
+package com.example.ccxt.bybit.spot.websocket;
 
 
 import com.example.ccxt.bybit.spot.domen.api.BybitService;
 import com.example.ccxt.bybit.spot.entity.Symbol;
 import com.example.ccxt.bybit.spot.service.SymbolsService;
-import com.google.gson.JsonObject;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
@@ -45,21 +44,6 @@ public class BybitSpotWebSocket extends WebSocketClient {
         }
     }
 
-    @Scheduled(fixedRate = 20000)
-    public void sendPing() {
-        if (!isOpen()) {
-            JsonObject pingMessage = new JsonObject();
-            pingMessage.addProperty("op", "ping");
-
-            log.info("Sending ping...");
-//            send(pingMessage.toString());
-        }
-    }
-
-    private boolean isPongMessage(String message) {
-        return message.contains("\"success\":true");
-    }
-
     @Override
     public void onClose(int i, String s, boolean b) {
         log.info("CONNECTION IS CLOSED");
@@ -72,7 +56,6 @@ public class BybitSpotWebSocket extends WebSocketClient {
 
     public void subscribeToTicker(final Symbol symbol) {
         String subscribeMessage = "{\"op\":\"subscribe\",\"args\":[\"tickers." + symbol.toString() + "\"]}";
-        log.info("SEND REQUEST TO SUBSCRIPTION: " + subscribeMessage);
         this.send(subscribeMessage);
     }
 
@@ -83,16 +66,13 @@ public class BybitSpotWebSocket extends WebSocketClient {
         this.send(subscribeMessage);
     }
 
-    public void subscribeToAllTickers() {
+    public void subscribeToAllTickers() throws InterruptedException {
+        symbolsService.updateSymbolList();
         List<Symbol> symbolList = symbolsService.getSymbolList();
         int chunkCount = symbolList.size() / 10;
         int chunk = symbolList.size() / chunkCount;
         for (int i = 0; i < symbolList.size(); i += chunk) {
-            List<Symbol> symbolSubList;
-            if (i + chunk < symbolList.size())
-                symbolSubList = symbolList.subList(i, i + chunk);
-            else
-                symbolSubList = symbolList.subList(i, symbolList.size() - 1);
+            List<Symbol> symbolSubList = symbolList.subList(i, Math.min(i + chunk, symbolList.size()));
             String symbols = symbolSubList.stream().map(symbol -> "\"tickers." + symbol.toString() + "\"").collect(Collectors.joining(","));
 
             String subscribeMessage = "{\"op\":\"subscribe\",\"args\":[" + symbols + "]}";

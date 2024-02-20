@@ -1,16 +1,16 @@
 package com.example.ccxt.bybit.spot.repository;
 
 public class DataStoreProvider {
-    private static DataStore instance;
+    private static BybitDataStore instance;
 
     private DataStoreProvider() {
     }
 
-    public static synchronized DataStore getInstance() {
+    public static synchronized BybitDataStore getInstance() {
         synchronized (DataStoreProvider.class) {
             if (instance == null) {
                 synchronized (DataStoreProvider.class) {
-                    instance = new DataStore();
+                    instance = new BybitDataStore();
                 }
             }
         }

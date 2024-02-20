@@ -1,6 +1,5 @@
-package com.example.ccxt.bybit.spot.service;
+package com.example.ccxt.bybit.spot.websocket;
 
-import com.example.ccxt.bybit.spot.BybitSpotWebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

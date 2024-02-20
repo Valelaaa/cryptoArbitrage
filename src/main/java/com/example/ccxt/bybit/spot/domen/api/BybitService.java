@@ -23,7 +23,7 @@ public class BybitService {
             .addConverterFactory(GsonConverterFactory.create())
             .addConverterFactory(ScalarsConverterFactory.create())
             .build();
-    BybitApiService apiService = retrofit.create(BybitApiService.class);
+    BybitSpotApiService apiService = retrofit.create(BybitSpotApiService.class);
 
     public List<TickerDto> getAllSymbols() {
         Call<TickersResponse> call = apiService.fetchTickers();

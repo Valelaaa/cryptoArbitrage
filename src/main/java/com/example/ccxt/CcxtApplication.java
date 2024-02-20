@@ -1,7 +1,11 @@
 package com.example.ccxt;
 
+import com.example.ccxt.bybit.spot.repository.BaseAssets;
+import com.example.ccxt.bybit.spot.repository.graph.ArbitrageOpportunityFinder;
+import com.example.ccxt.bybit.spot.repository.graph.GraphProvider;
+import com.example.ccxt.bybit.spot.repository.graph.TickerGraph;
 import com.example.ccxt.bybit.spot.service.Arbitrage.arbitragealgorithm.Arbitrage;
-import com.example.ccxt.bybit.spot.service.Arbitrage.ArbitrageService;
+import com.example.ccxt.bybit.spot.service.Arbitrage.BybitArbitrageService;
 import com.example.ccxt.bybit.spot.service.Arbitrage.arbitragealgorithm.TriangularArbitrage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +17,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @SpringBootApplication
@@ -20,16 +26,23 @@ import java.util.List;
 @EnableScheduling
 public class CcxtApplication {
     public static Arbitrage currentArbitrage = new TriangularArbitrage();
-    static ArbitrageService arbitrageService = new ArbitrageService(currentArbitrage);
-    public static void main(String[] args) {
+    static BybitArbitrageService arbitrageService = new BybitArbitrageService(currentArbitrage);
+    static ArbitrageOpportunityFinder finder = new ArbitrageOpportunityFinder();
+
+    public static void main(String[] args) throws InterruptedException {
         SpringApplication.run(CcxtApplication.class, args);
-        try {
-            while (true) {
-                Thread.sleep(1000);
-                arbitrageService.doArbitrage();
+        while (true) {
+            Thread.sleep(10000);
+            System.out.println("List of paths:");
+            List<List<String>> allPath = finder.findAllPaths("USDT", 3);
+            long currentTime = Instant.now().getEpochSecond();
+            for (List<String> path : allPath) {
+                for (String road : path) {
+                    System.out.print(road + "->");
+                }
+                System.out.println();
             }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            System.out.println("Search time: " + (Instant.now().getEpochSecond() - currentTime));
         }
     }
 
