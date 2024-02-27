@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class TickerDto {
+public class TickerDto implements Cloneable{
     private String symbol;
     private String lastPrice;
     private String price24hPcnt;
@@ -27,5 +27,19 @@ public class TickerDto {
                 ", volume24h='" + volume24h + '\'' +
                 ", usdIndex='" + usdIndex + '\'' +
                 '}';
+    }
+
+    @Override
+    public TickerDto clone() throws CloneNotSupportedException {
+        return new TickerDto(
+                this.symbol,
+                this.lastPrice,
+                this.price24hPcnt,
+                this.highPrice24h,
+                this.lowPrice24h,
+                this.turnover24h,
+                this.volume24h,
+                this.usdIndex
+        );
     }
 }

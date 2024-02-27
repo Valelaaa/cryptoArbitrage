@@ -51,10 +51,10 @@ public class ArbitrageOpportunityFinder {
                         if (tickerDto3 == null) continue;
                         Direction direction3;
                         direction3 = Direction.SELL;
-//                        System.out.print(tickerDto1.getSymbol() + "->");
-//                        System.out.print(tickerDto2.getSymbol() + "->");
-//                        System.out.println(tickerDto3.getSymbol());
-//                        arbitrage.doArbitrage(Map.entry(direction1, tickerDto1), Map.entry(direction2, tickerDto2), Map.entry(direction3, tickerDto3));
+                        System.out.print(tickerDto1.getSymbol() + "->");
+                        System.out.print(tickerDto2.getSymbol() + "->");
+                        System.out.println(tickerDto3.getSymbol());
+                        arbitrage.doArbitrage(Map.entry(direction1, tickerDto1), Map.entry(direction2, tickerDto2), Map.entry(direction3, tickerDto3));
                         baseBaseCounter++;
 
                     }
