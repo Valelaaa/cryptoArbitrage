@@ -6,12 +6,13 @@ import com.example.ccxt.bybit.spot.service.Arbitrage.arbitragealgorithm.Arbitrag
 public class BybitArbitrageService {
     private final Arbitrage arbitrage;
     private final ArbitrageOpportunityFinder arbitrageFinder;
-    public BybitArbitrageService(Arbitrage chosenArbitrage){
+
+    public BybitArbitrageService(Arbitrage chosenArbitrage) {
         arbitrage = chosenArbitrage;
         arbitrageFinder = new ArbitrageOpportunityFinder(arbitrage, BaseAssets.USDT);
     }
 
-    public void doArbitrage(){
+    public void doArbitrage() {
         arbitrageFinder.findOpportunity();
     }
 }

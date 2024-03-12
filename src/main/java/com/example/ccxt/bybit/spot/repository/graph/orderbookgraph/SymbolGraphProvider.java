@@ -1,31 +1,31 @@
-package com.example.ccxt.bybit.spot.repository.graph;
+package com.example.ccxt.bybit.spot.repository.graph.orderbookgraph;
+
 
 import com.example.ccxt.bybit.spot.repository.DataStoreProvider;
-import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
-public class GraphProvider {
-    private static AssetsGraph instance;
+public class SymbolGraphProvider {
+    private static SymbolGraph instance;
 
-    private GraphProvider() {
+    private SymbolGraphProvider() {
     }
 
-    public static synchronized AssetsGraph getInstance() {
+    public static synchronized SymbolGraph getInstance() {
         synchronized (DataStoreProvider.class) {
             if (instance == null) {
                 synchronized (DataStoreProvider.class) {
-                    instance = new AssetsGraph();
+                    instance = new SymbolGraph();
                 }
             }
         }
         return instance;
     }
 
-    public static synchronized DefaultDirectedGraph<String, TickerEdge> getCopy() {
+    public static synchronized DefaultDirectedGraph<String, SymbolEdge> getCopy() {
         synchronized (DataStoreProvider.class) {
             if (instance == null) {
                 synchronized (DataStoreProvider.class) {
-                    instance = new AssetsGraph();
+                    instance = new SymbolGraph();
                 }
             }
         }

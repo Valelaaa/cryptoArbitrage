@@ -1,4 +1,4 @@
-package com.example.ccxt.bybit.spot.repository.graph;
+package com.example.ccxt.bybit.spot.repository.graph.ticker;
 
 import com.example.ccxt.bybit.spot.repository.BaseAssets;
 import org.jgrapht.Graphs;

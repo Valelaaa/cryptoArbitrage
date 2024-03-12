@@ -429,13 +429,13 @@ public enum QuoteAssets {
 
     public final String value;
 
-    QuoteAssets(String value){
+    QuoteAssets(String value) {
         this.value = value;
     }
 
     @Override
     public String toString() {
-        return value ;
+        return value;
     }
 
 }

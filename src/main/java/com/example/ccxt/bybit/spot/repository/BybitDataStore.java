@@ -5,7 +5,6 @@ import com.example.ccxt.bybit.spot.entity.TickerDto;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 //Old implementation is ConcurrentHashMap but order has value
 public class BybitDataStore extends ConcurrentHashMap<BaseAssets, ConcurrentHashMap<String, TickerDto>> implements DataStore {

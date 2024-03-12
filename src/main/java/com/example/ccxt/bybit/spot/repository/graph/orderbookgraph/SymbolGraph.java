@@ -1,38 +1,36 @@
-package com.example.ccxt.bybit.spot.repository.graph;
+package com.example.ccxt.bybit.spot.repository.graph.orderbookgraph;
 
 import com.example.ccxt.bybit.spot.entity.Symbol;
 import com.example.ccxt.bybit.spot.entity.TickerDto;
 import com.example.ccxt.bybit.spot.repository.BaseAssets;
 import com.example.ccxt.bybit.spot.repository.DataStore;
 import com.example.ccxt.bybit.spot.service.Arbitrage.Direction;
-import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.concurrent.AsSynchronizedGraph;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
-public class AssetsGraph extends AsSynchronizedGraph<String, TickerEdge> implements DataStore {
+public class SymbolGraph extends AsSynchronizedGraph<String, SymbolEdge> {
+
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public AssetsGraph() {
-        super(new DefaultDirectedGraph<>(TickerEdge.class));
+    public SymbolGraph() {
+        super(new DefaultDirectedGraph<>(SymbolEdge.class));
     }
 
-    public AssetsGraph(Class<? extends TickerEdge> edgeClass) {
+    public SymbolGraph(Class<? extends SymbolEdge> edgeClass) {
         super(new DefaultDirectedGraph<>(edgeClass));
     }
 
-    public AssetsGraph(Supplier<String> vertexSupplier, Supplier<TickerEdge> edgeSupplier, boolean weighted) {
+    public SymbolGraph(Supplier<String> vertexSupplier, Supplier<SymbolEdge> edgeSupplier, boolean weighted) {
         super(new DefaultDirectedGraph<>(vertexSupplier, edgeSupplier, weighted));
     }
 
-    @Override
-    public void put(Symbol symbol, TickerDto tickerDto) {
-        String symbolStr = symbol.toString();
+    public void put(String symbol) {
         for (BaseAssets baseAsset : BaseAssets.values()) {
-            if (symbolStr.endsWith(baseAsset.value)) {
-                String quoteAsset = symbolStr.substring(0, symbolStr.lastIndexOf(baseAsset.value));
+            if (symbol.endsWith(baseAsset.value)) {
+                String quoteAsset = symbol.substring(0, symbol.lastIndexOf(baseAsset.value));
                 lock.writeLock().lock();
                 try {
                     addVertex(baseAsset.value);
@@ -43,8 +41,8 @@ public class AssetsGraph extends AsSynchronizedGraph<String, TickerEdge> impleme
                     removeAllEdges(quoteAsset, baseAsset.value);
 
                     // Добавляем новые рёбра
-                    TickerEdge edge = new TickerEdge(tickerDto, Direction.BUY);
-                    TickerEdge reverseEdge = new TickerEdge(tickerDto, Direction.SELL);
+                    SymbolEdge edge = new SymbolEdge(symbol, Direction.BUY);
+                    SymbolEdge reverseEdge = new SymbolEdge(symbol, Direction.SELL);
 
                     addEdge(baseAsset.value, quoteAsset, edge);
                     addEdge(quoteAsset, baseAsset.value, reverseEdge);
@@ -55,15 +53,15 @@ public class AssetsGraph extends AsSynchronizedGraph<String, TickerEdge> impleme
         }
     }
 
-    public DefaultDirectedGraph<String, TickerEdge> copy() {
+    public DefaultDirectedGraph<String, SymbolEdge> copy() {
         lock.readLock().lock();
         try {
             // Создаем новый граф и копируем вершины и ребра из исходного графа
-            DefaultDirectedGraph<String, TickerEdge> copyGraph = new DefaultDirectedGraph<>(TickerEdge.class);
+            DefaultDirectedGraph<String, SymbolEdge> copyGraph = new DefaultDirectedGraph<>(SymbolEdge.class);
             for (String vertex : this.vertexSet()) {
                 copyGraph.addVertex(vertex);
             }
-            for (TickerEdge edge : this.edgeSet()) {
+            for (SymbolEdge edge : this.edgeSet()) {
                 copyGraph.addEdge(getEdgeSource(edge), getEdgeTarget(edge), edge.clone());
             }
             return copyGraph;
@@ -71,4 +69,5 @@ public class AssetsGraph extends AsSynchronizedGraph<String, TickerEdge> impleme
             lock.readLock().unlock();
         }
     }
+
 }

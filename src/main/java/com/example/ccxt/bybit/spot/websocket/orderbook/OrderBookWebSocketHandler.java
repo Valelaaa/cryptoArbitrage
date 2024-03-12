@@ -1,4 +1,4 @@
-package com.example.ccxt.bybit.spot.websocket;
+package com.example.ccxt.bybit.spot.websocket.orderbook;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,16 +6,15 @@ import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
 import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 @Service
-public class WebSocketHandler {
-    private BybitSpotWebSocket ws;
+public class OrderBookWebSocketHandler {
+    private BybitOrderBookWebSocket ws;
     private Consumer<String> messageHandler;
-    private Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
+    private Logger log = LoggerFactory.getLogger(OrderBookWebSocketHandler.class);
 
-    public WebSocketHandler() {
+    public OrderBookWebSocketHandler() {
         this.messageHandler = Objects.requireNonNullElseGet(messageHandler, () -> (System.out::println));
     }
 
@@ -23,7 +22,7 @@ public class WebSocketHandler {
         Thread webSockedReadThread = new Thread(() ->
         {
             try {
-                ws = new BybitSpotWebSocket();
+                ws = new BybitOrderBookWebSocket();
                 ws.setMessageHandler(messageHandler);
                 ws.connect();
                 while (!ws.isOpen()) {

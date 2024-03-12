@@ -1,4 +1,4 @@
-package com.example.ccxt.bybit.spot.repository.graph;
+package com.example.ccxt.bybit.spot.repository.graph.ticker;
 
 import com.example.ccxt.bybit.spot.entity.TickerDto;
 import com.example.ccxt.bybit.spot.service.Arbitrage.Direction;
@@ -6,6 +6,7 @@ import com.example.ccxt.bybit.spot.service.Arbitrage.Direction;
 public class TickerEdge implements Cloneable {
     private TickerDto ticker;
     private final Direction direction;
+
     public TickerEdge(TickerDto tick, Direction direction) {
         this.ticker = tick;
         this.direction = direction;

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class TickerDto implements Cloneable{
+public class TickerDto implements Cloneable {
     private String symbol;
     private String lastPrice;
     private String price24hPcnt;
